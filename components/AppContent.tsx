@@ -192,10 +192,10 @@ export default function AppContent() {
                   Learn <TypingEffect 
                     texts={[
                       'Anything',
-                      'Programming',
+                      'Coding',
                       'Design',
                       'Marketing',
-                      'Data Science',
+                      'Calculus',
                       'AI & ML',
                       'Business',
                       'Languages'
@@ -204,7 +204,7 @@ export default function AppContent() {
                     speed={150}
                     deleteSpeed={100}
                     delay={1500}
-                  /> With AI
+                  />
                 </h2>
               </div>
               <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
