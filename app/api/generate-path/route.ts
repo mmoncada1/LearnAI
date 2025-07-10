@@ -3,12 +3,22 @@ import OpenAI from 'openai';
 import { LearningPath } from '@/types';
 import { validateResourceUrl, getCuratedResources, RELIABLE_RESOURCE_DOMAINS } from '@/lib/resources';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(request: NextRequest) {
   try {
+    // Check for API key first
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY is not set');
+      return NextResponse.json(
+        { error: 'OpenAI API key not configured. Please check environment variables.' },
+        { status: 500 }
+      );
+    }
+
+    // Initialize OpenAI client inside the function
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const { topic, difficulty, timeCommitment, priorExperience } = await request.json();
 
     if (!topic) {
