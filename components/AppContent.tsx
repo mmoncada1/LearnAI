@@ -134,7 +134,7 @@ export default function AppContent() {
                 </h2>
               </div>
               <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-                Enter any skill or topic, and we'll create a <span className="gradient-text font-semibold">personalized learning roadmap</span> with curated resources just for you.
+                Enter any skill or topic, and we&apos;ll create a <span className="gradient-text font-semibold">personalized learning roadmap</span> with curated resources just for you.
               </p>
             </div>
 
@@ -166,7 +166,7 @@ export default function AppContent() {
                   className="select-field text-lg"
                   disabled={loading}
                 >
-                    <option value="beginner">🌱 Beginner - I'm new to this</option>
+                    <option value="beginner">🌱 Beginner - I&apos;m new to this</option>
                     <option value="intermediate">🌿 Intermediate - I have some experience</option>
                     <option value="advanced">🌳 Advanced - I want to deepen my knowledge</option>
                   </select>

@@ -15,7 +15,7 @@ export default function ResourceHelpNotification() {
             About Learning Resources
           </h3>
           <p className="text-sm text-blue-800 dark:text-blue-300 mb-2">
-            All resources are carefully curated from trusted educational platforms. If a link doesn't work:
+            All resources are carefully curated from trusted educational platforms. If a link doesn&apos;t work:
           </p>
           <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1 ml-4">
             <li>• Try refreshing the page or opening in a new tab</li>

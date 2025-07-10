@@ -242,7 +242,7 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
               Congratulations! 🎉
             </h3>
             <p className="text-green-700 dark:text-green-300 mb-6 text-lg">
-              You've completed your learning path for <span className="font-semibold">{learningPath.topic}</span>!
+              You&apos;ve completed your learning path for <span className="font-semibold">{learningPath.topic}</span>!
             </p>
             <button
               onClick={onReset}
