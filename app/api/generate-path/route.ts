@@ -4,7 +4,12 @@ import { LearningPath } from '@/types';
 import { validateResourceUrl, getCuratedResources, RELIABLE_RESOURCE_DOMAINS } from '@/lib/resources';
 
 export async function POST(request: NextRequest) {
+  console.log('=== API Route Called ===');
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('Timestamp:', new Date().toISOString());
+  
   try {
+    console.log('Checking API key...');
     // Check for API key first
     if (!process.env.OPENAI_API_KEY) {
       console.error('OPENAI_API_KEY is not set');
@@ -14,19 +19,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize OpenAI client inside the function
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    console.log('API key exists, length:', process.env.OPENAI_API_KEY.length);
+    console.log('API key prefix:', process.env.OPENAI_API_KEY.substring(0, 7) + '...');
 
+    console.log('Parsing request body...');
     const { topic, difficulty, timeCommitment, priorExperience } = await request.json();
+    console.log('Request data:', { topic, difficulty, timeCommitment, priorExperience });
 
     if (!topic) {
+      console.log('Topic validation failed');
       return NextResponse.json(
         { error: 'Topic is required' },
         { status: 400 }
       );
     }
+
+    console.log('Initializing OpenAI client...');
+    // Initialize OpenAI client inside the function
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    console.log('OpenAI client initialized successfully');
 
     const prompt = `Generate a comprehensive learning path for: "${topic}"
 
@@ -89,6 +102,10 @@ Guidelines:
 
 Focus on creating a realistic, achievable learning path with genuine, working resources.`;
 
+    console.log('Making OpenAI API call...');
+    console.log('Using model: gpt-4o-mini');
+    console.log('Prompt length:', prompt.length);
+    
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini", // Updated to use available model
       messages: [
@@ -107,6 +124,8 @@ Focus on creating a realistic, achievable learning path with genuine, working re
 
     console.log('OpenAI API call successful');
     console.log('Response length:', completion.choices[0].message.content?.length || 0);
+    console.log('Model used:', completion.model);
+    console.log('Usage:', completion.usage);
 
     const responseText = completion.choices[0].message.content;
     
@@ -163,18 +182,64 @@ Focus on creating a realistic, achievable learning path with genuine, working re
 
     return NextResponse.json(learningPath);
 
-  } catch (error) {
-    console.error('Error generating learning path:', error);
+  } catch (error: any) {
+    console.error('=== ERROR in API Route ===');
+    console.error('Error type:', typeof error);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error type field:', error.type);
+    console.error('Error status:', error.status);
+    console.error('Full error object:', JSON.stringify(error, null, 2));
+    console.error('Error stack:', error.stack);
     
-    if (error instanceof Error && error.message.includes('API key')) {
+    // Check for missing API key
+    if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
+        { error: 'OpenAI API key not configured. Please check environment variables.' },
         { status: 500 }
       );
     }
+    
+    // Check for API key related errors
+    if (error.code === 'invalid_api_key' || error.message?.includes('API key')) {
+      return NextResponse.json(
+        { error: 'Invalid OpenAI API key. Please check your API key configuration.' },
+        { status: 401 }
+      );
+    }
+    
+    // Check for rate limit errors
+    if (error.code === 'rate_limit_exceeded') {
+      return NextResponse.json(
+        { error: 'OpenAI rate limit exceeded. Please try again in a moment.' },
+        { status: 429 }
+      );
+    }
+    
+    // Check for quota/billing errors
+    if (error.code === 'insufficient_quota') {
+      return NextResponse.json(
+        { error: 'OpenAI quota exceeded. Please check your OpenAI billing.' },
+        { status: 402 }
+      );
+    }
 
+    // Check for model access errors
+    if (error.code === 'model_not_found' || error.message?.includes('model')) {
+      return NextResponse.json(
+        { error: 'Model access issue. Your API key may not have access to this model.' },
+        { status: 403 }
+      );
+    }
+
+    // Return detailed error for debugging
     return NextResponse.json(
-      { error: 'Failed to generate learning path. Please try again.' },
+      { 
+        error: 'Failed to generate learning path. Please try again.',
+        details: error.message,
+        errorCode: error.code,
+        errorType: error.type
+      },
       { status: 500 }
     );
   }
