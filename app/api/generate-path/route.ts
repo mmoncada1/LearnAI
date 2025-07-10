@@ -105,6 +105,9 @@ Focus on creating a realistic, achievable learning path with genuine, working re
       max_tokens: 2000,
     });
 
+    console.log('OpenAI API call successful');
+    console.log('Response length:', completion.choices[0].message.content?.length || 0);
+
     const responseText = completion.choices[0].message.content;
     
     if (!responseText) {
