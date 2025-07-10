@@ -86,7 +86,7 @@ export default function AppContent() {
                 <SparklesIcon className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold gradient-text">LearnAI</h1>
+                <h1 className="text-3xl font-bold gradient-text">SkillMapAI</h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1 font-medium">Personalized learning paths powered by AI</p>
               </div>
             </div>

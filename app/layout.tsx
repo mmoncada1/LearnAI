@@ -4,12 +4,12 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import ParticleBackground from '@/components/ParticleBackground'
 
 export const metadata = {
-  title: 'Learn Anything With AI | Personalized Learning Paths',
+  title: 'SkillMapAI | Personalized Learning Paths',
   description: 'Get AI-generated, personalized learning roadmaps for any skill or topic. Turn your learning goals into actionable steps with curated resources.',
   keywords: 'AI learning, personalized education, learning paths, skill development, online learning',
-  authors: [{ name: 'Learn Anything AI' }],
+  authors: [{ name: 'SkillMapAI' }],
   openGraph: {
-    title: 'Learn Anything With AI',
+    title: 'SkillMapAI',
     description: 'AI-powered personalized learning paths for any skill',
     type: 'website',
   },
