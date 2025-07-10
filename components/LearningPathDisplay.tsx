@@ -12,6 +12,8 @@ import {
   ArrowTopRightOnSquareIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
+import LinkValidator from './LinkValidator';
+import ResourceHelpNotification from './ResourceHelpNotification';
 
 interface LearningPathDisplayProps {
   learningPath: LearningPath;
@@ -63,6 +65,9 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {/* Resource Help Notification */}
+      <ResourceHelpNotification />
+      
       {/* Header */}
       <div className="card">
         <div className="flex items-start justify-between mb-6">
@@ -159,9 +164,21 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
 
                   {/* Resources */}
                   <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
-                      Resources
-                    </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
+                        Resources
+                      </h4>
+                      <div className="flex items-center space-x-3 text-xs text-gray-500">
+                        <div className="flex items-center space-x-1">
+                          <CheckCircleIcon className="w-3 h-3 text-green-600" />
+                          <span>Verified</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                          <span>External link</span>
+                        </div>
+                      </div>
+                    </div>
                     <div className="grid gap-3">
                       {stage.resources.map((resource, resourceIndex) => (
                         <a
@@ -179,6 +196,7 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
                               <h5 className="font-medium text-gray-900 group-hover:text-primary-700 transition-colors duration-200">
                                 {resource.title}
                               </h5>
+                              <LinkValidator url={resource.url} />
                               <ArrowTopRightOnSquareIcon className="w-4 h-4 text-gray-400 group-hover:text-primary-500" />
                             </div>
                             <div className="flex items-center space-x-2 mt-1">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { LearningPath } from '@/types';
+import { validateResourceUrl, getCuratedResources, RELIABLE_RESOURCE_DOMAINS } from '@/lib/resources';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -24,6 +25,27 @@ Requirements:
 - Time commitment: ${timeCommitment || 'Flexible'}
 - Prior experience: ${priorExperience || 'None specified'}
 
+CRITICAL: Only use REAL, WORKING URLs from these trusted domains:
+- YouTube (youtube.com) - for video content
+- freeCodeCamp (freecodecamp.org) - for comprehensive courses
+- MDN Web Docs (developer.mozilla.org) - for documentation
+- Coursera (coursera.org) - for structured courses
+- Khan Academy (khanacademy.org) - for beginner content
+- W3Schools (w3schools.com) - for tutorials
+- Codecademy (codecademy.com) - for interactive learning
+- GitHub (github.com) - for practice projects
+- Dev.to (dev.to) - for articles
+- CSS-Tricks (css-tricks.com) - for web development
+
+EXAMPLES of REAL URLs to use:
+- https://www.freecodecamp.org/learn/responsive-web-design/
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide
+- https://www.youtube.com/watch?v=hdI2bqOjy3c (JavaScript Crash Course)
+- https://react.dev/learn
+- https://docs.python.org/3/tutorial/
+- https://www.w3schools.com/html/
+- https://css-tricks.com/snippets/css/complete-guide-grid/
+
 Please provide a JSON response with the following structure:
 {
   "topic": "string",
@@ -37,7 +59,7 @@ Please provide a JSON response with the following structure:
       "resources": [
         {
           "title": "Resource name",
-          "url": "actual working URL",
+          "url": "REAL WORKING URL from trusted domains above",
           "type": "video|article|course|documentation|practice",
           "duration": "estimated time"
         }
@@ -49,12 +71,13 @@ Please provide a JSON response with the following structure:
 Guidelines:
 - Create 5-8 logical learning stages
 - Include 2-4 high-quality, real resources per stage
-- Use actual URLs from reputable sources (YouTube, freeCodeCamp, MDN, Coursera, etc.)
+- ONLY use URLs from the trusted domains listed above
 - Make it progressive - each stage builds on the previous
 - Include hands-on practice opportunities
 - Be specific and actionable
+- Verify URLs are real and accessible
 
-Focus on creating a realistic, achievable learning path with genuine, helpful resources.`;
+Focus on creating a realistic, achievable learning path with genuine, working resources.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini", // Updated to use available model
@@ -96,6 +119,34 @@ Focus on creating a realistic, achievable learning path with genuine, helpful re
     if (!learningPath.topic || !learningPath.stages || !Array.isArray(learningPath.stages)) {
       throw new Error('Invalid learning path structure');
     }
+
+    // Validate and enhance resources with fallbacks
+    const curatedResources = getCuratedResources(topic, difficulty);
+    
+    learningPath.stages = learningPath.stages.map((stage, stageIndex) => {
+      // Filter out invalid URLs and add fallback resources if needed
+      const validResources = stage.resources.filter(resource => 
+        resource.url && validateResourceUrl(resource.url)
+      );
+      
+      // If we don't have enough valid resources, add curated ones
+      if (validResources.length < 2 && curatedResources.length > 0) {
+        const fallbackResource = curatedResources[stageIndex % curatedResources.length];
+        if (fallbackResource) {
+          validResources.push(fallbackResource);
+        }
+      }
+      
+      return {
+        ...stage,
+        resources: validResources.length > 0 ? validResources : [{
+          title: "Search for resources on this topic",
+          url: `https://www.google.com/search?q=${encodeURIComponent(stage.title + ' tutorial')}`,
+          type: "article" as const,
+          duration: "Variable"
+        }]
+      };
+    });
 
     return NextResponse.json(learningPath);
 
