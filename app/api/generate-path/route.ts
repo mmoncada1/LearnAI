@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { LearningPath } from '@/types';
-import { validateResourceUrl, getCuratedResources, RELIABLE_RESOURCE_DOMAINS } from '@/lib/resources';
+// Temporarily comment out this import to test if it's causing issues
+// import { validateResourceUrl, getCuratedResources, RELIABLE_RESOURCE_DOMAINS } from '@/lib/resources';
 
 export async function POST(request: NextRequest) {
   console.log('=== API Route Called ===');
@@ -153,30 +154,28 @@ Focus on creating a realistic, achievable learning path with genuine, working re
     }
 
     // Validate and enhance resources with fallbacks
-    const curatedResources = getCuratedResources(topic, difficulty);
+    // Temporarily disable resource validation to test
+    // const curatedResources = getCuratedResources(topic, difficulty);
     
     learningPath.stages = learningPath.stages.map((stage, stageIndex) => {
-      // Filter out invalid URLs and add fallback resources if needed
+      // Simple validation - just check if URL exists
       const validResources = stage.resources.filter(resource => 
-        resource.url && validateResourceUrl(resource.url)
+        resource.url && resource.url.startsWith('http')
       );
       
-      // If we don't have enough valid resources, add curated ones
-      if (validResources.length < 2 && curatedResources.length > 0) {
-        const fallbackResource = curatedResources[stageIndex % curatedResources.length];
-        if (fallbackResource) {
-          validResources.push(fallbackResource);
-        }
-      }
-      
-      return {
-        ...stage,
-        resources: validResources.length > 0 ? validResources : [{
+      // If no valid resources, add a fallback
+      if (validResources.length === 0) {
+        validResources.push({
           title: "Search for resources on this topic",
           url: `https://www.google.com/search?q=${encodeURIComponent(stage.title + ' tutorial')}`,
           type: "article" as const,
           duration: "Variable"
-        }]
+        });
+      }
+      
+      return {
+        ...stage,
+        resources: validResources
       };
     });
 
