@@ -317,9 +317,6 @@ export default function AppContent() {
         )}
       </main>
 
-      {/* Floating Action Button */}
-      <FloatingActionButton />
-
       {/* Success Animation */}
       <SuccessAnimation 
         show={showSuccess}
