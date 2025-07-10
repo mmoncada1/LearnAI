@@ -36,11 +36,21 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Initializing OpenAI client...');
-    // Initialize OpenAI client with timeout and retry settings
+    // Initialize OpenAI client with production-optimized settings
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-      timeout: 30000, // 30 second timeout
-      maxRetries: 2,
+      timeout: 60000, // Increase to 60 seconds for production
+      maxRetries: 3,   // More retries for better reliability
+      // Add fetch configuration for better production compatibility
+      fetch: (url, init) => {
+        return fetch(url, {
+          ...init,
+          headers: {
+            ...init?.headers,
+            'User-Agent': 'SkillMapAI/1.0',
+          },
+        });
+      },
     });
     console.log('OpenAI client initialized successfully');
 
