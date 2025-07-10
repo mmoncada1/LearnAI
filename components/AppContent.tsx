@@ -2,13 +2,18 @@
 
 import { useState } from 'react';
 import { LearningPath, GeneratePathRequest } from '@/types';
+import { useAuth } from '@/lib/AuthContext';
 import LearningPathDisplay from '@/components/LearningPathDisplay';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ThemeToggle from '@/components/ThemeToggle';
 import FloatingActionButton from '@/components/FloatingActionButton';
 import SuccessAnimation from '@/components/SuccessAnimation';
 import TypingEffect from '@/components/TypingEffect';
-import { BookOpenIcon, SparklesIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
+import AuthModal from '@/components/AuthModal';
+import UserProfile from '@/components/UserProfile';
+import UserDashboard from '@/components/UserDashboard';
+import Notification from '@/components/Notification';
+import { BookOpenIcon, SparklesIcon, AcademicCapIcon, UserIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import { sampleLearningPath } from '@/lib/sampleData';
 
 export default function AppContent() {
@@ -18,6 +23,15 @@ export default function AppContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error' | 'info';
+    show: boolean;
+  }>({ message: '', type: 'success', show: false });
+  
+  const { isAuthenticated, user, userProgress } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +66,12 @@ export default function AppContent() {
 
       const path: LearningPath = await response.json();
       setShowSuccess(true);
+      
+      // If user is authenticated, save the learning path
+      if (isAuthenticated) {
+        await saveLearningPath(path);
+      }
+      
       setTimeout(() => {
         setLearningPath(path);
         setShowSuccess(false);
@@ -61,6 +81,38 @@ export default function AppContent() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const saveLearningPath = async (path: LearningPath) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      const response = await fetch('/api/user/progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(path),
+      });
+
+      if (response.ok) {
+        setNotification({
+          message: 'Learning path saved successfully!',
+          type: 'success',
+          show: true,
+        });
+      } else {
+        console.error('Failed to save learning path');
+      }
+    } catch (error) {
+      console.error('Error saving learning path:', error);
+    }
+  };
+
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setNotification({ message, type, show: true });
   };
 
   const handleReset = () => {
@@ -90,8 +142,30 @@ export default function AppContent() {
                 <p className="text-gray-600 dark:text-gray-400 mt-1 font-medium">Personalized learning paths powered by AI</p>
               </div>
             </div>
-            <div className="floating-card">
-              <ThemeToggle />
+            <div className="flex items-center space-x-4">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setShowDashboard(true)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors"
+                  >
+                    <ChartBarIcon className="w-5 h-5" />
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </button>
+                  <UserProfile />
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg hover:from-primary-600 hover:to-purple-700 transition-all duration-200 shadow-lg"
+                >
+                  <UserIcon className="w-5 h-5" />
+                  <span>Sign In</span>
+                </button>
+              )}
+              <div className="floating-card">
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </div>
@@ -237,6 +311,7 @@ export default function AppContent() {
             <LearningPathDisplay 
               learningPath={learningPath} 
               onReset={handleReset}
+              onSavePrompt={() => setShowAuthModal(true)}
             />
           </div>
         )}
@@ -250,6 +325,20 @@ export default function AppContent() {
         show={showSuccess}
         message="Learning Path Generated!"
         onComplete={() => setShowSuccess(false)}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+
+      {/* User Dashboard */}
+      <UserDashboard isOpen={showDashboard} onClose={() => setShowDashboard(false)} />
+
+      {/* Notification */}
+      <Notification
+        message={notification.message}
+        type={notification.type}
+        show={notification.show}
+        onClose={() => setNotification(prev => ({ ...prev, show: false }))}
       />
     </div>
   );

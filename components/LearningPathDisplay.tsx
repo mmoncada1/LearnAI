@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { LearningPath, LearningStage } from '@/types';
+import { useAuth } from '@/lib/AuthContext';
 import { 
   CheckCircleIcon, 
   PlayIcon, 
@@ -10,7 +11,9 @@ import {
   ClockIcon,
   ArrowPathIcon,
   ArrowTopRightOnSquareIcon,
-  SparklesIcon
+  SparklesIcon,
+  BookmarkIcon,
+  UserIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
 import LinkValidator from './LinkValidator';
@@ -19,10 +22,13 @@ import ResourceHelpNotification from './ResourceHelpNotification';
 interface LearningPathDisplayProps {
   learningPath: LearningPath;
   onReset: () => void;
+  onSavePrompt?: () => void;
 }
 
-export default function LearningPathDisplay({ learningPath, onReset }: LearningPathDisplayProps) {
+export default function LearningPathDisplay({ learningPath, onReset, onSavePrompt }: LearningPathDisplayProps) {
   const [completedStages, setCompletedStages] = useState<Set<number>>(new Set());
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const toggleStageComplete = (stageIndex: number) => {
     const newCompleted = new Set(completedStages);
@@ -90,13 +96,24 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
               </div>
             </div>
           </div>
-          <button
-            onClick={onReset}
-            className="btn-secondary flex items-center space-x-2"
-          >
-            <ArrowPathIcon className="w-4 h-4" />
-            <span>New Path</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            {!isAuthenticated && (
+              <button
+                onClick={() => setShowSavePrompt(true)}
+                className="btn-primary flex items-center space-x-2"
+              >
+                <BookmarkIcon className="w-4 h-4" />
+                <span>Save Progress</span>
+              </button>
+            )}
+            <button
+              onClick={onReset}
+              className="btn-secondary flex items-center space-x-2"
+            >
+              <ArrowPathIcon className="w-4 h-4" />
+              <span>New Path</span>
+            </button>
+          </div>
         </div>
 
         {/* Progress Bar */}
@@ -251,6 +268,41 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
               <SparklesIcon className="w-5 h-5 mr-2" />
               Start a New Learning Journey
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Save Prompt Modal for Non-Authenticated Users */}
+      {showSavePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          <div className="glass-card w-full max-w-md p-8 mx-4">
+            <div className="text-center">
+              <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full mx-auto mb-4">
+                <BookmarkIcon className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold gradient-text mb-4">Save Your Progress</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Create an account to save your learning path and track your progress across sessions.
+              </p>
+              <div className="flex flex-col space-y-3">
+                <button
+                  onClick={() => {
+                    setShowSavePrompt(false);
+                    onSavePrompt?.();
+                  }}
+                  className="w-full py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white font-medium rounded-lg hover:from-primary-600 hover:to-purple-700 transition-all duration-200"
+                >
+                  <UserIcon className="w-5 h-5 inline mr-2" />
+                  Sign Up to Save
+                </button>
+                <button
+                  onClick={() => setShowSavePrompt(false)}
+                  className="w-full py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                >
+                  Continue Without Saving
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
