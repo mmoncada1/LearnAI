@@ -36,9 +36,11 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Initializing OpenAI client...');
-    // Initialize OpenAI client inside the function
+    // Initialize OpenAI client with timeout and retry settings
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
+      timeout: 30000, // 30 second timeout
+      maxRetries: 2,
     });
     console.log('OpenAI client initialized successfully');
 
@@ -104,11 +106,11 @@ Guidelines:
 Focus on creating a realistic, achievable learning path with genuine, working resources.`;
 
     console.log('Making OpenAI API call...');
-    console.log('Using model: gpt-4o-mini');
+    console.log('Using model: gpt-3.5-turbo'); // Try more stable model
     console.log('Prompt length:', prompt.length);
     
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Updated to use available model
+      model: "gpt-3.5-turbo", // Use more widely available model
       messages: [
         {
           role: "system",
@@ -120,7 +122,7 @@ Focus on creating a realistic, achievable learning path with genuine, working re
         }
       ],
       temperature: 0.7,
-      max_tokens: 2000,
+      max_tokens: 1500, // Reduce token count to speed up response
     });
 
     console.log('OpenAI API call successful');
@@ -196,6 +198,14 @@ Focus on creating a realistic, achievable learning path with genuine, working re
       return NextResponse.json(
         { error: 'OpenAI API key not configured. Please check environment variables.' },
         { status: 500 }
+      );
+    }
+    
+    // Check for connection errors
+    if (error.message?.includes('Connection error') || error.message?.includes('network') || error.message?.includes('timeout')) {
+      return NextResponse.json(
+        { error: 'Connection to OpenAI failed. This may be a temporary network issue. Please try again.' },
+        { status: 503 }
       );
     }
     
