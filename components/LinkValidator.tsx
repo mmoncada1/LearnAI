@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 
 interface LinkValidatorProps {
   url: string;
@@ -51,12 +51,12 @@ export default function LinkValidator({ url, className = '' }: LinkValidatorProp
   return (
     <div className={`inline-flex items-center ${className}`}>
       {isValid ? (
-        <div className="flex items-center text-green-600" title="Verified working link">
+        <div className="flex items-center text-green-600 dark:text-green-400" title="Verified working link">
           <CheckCircleIcon className="w-3 h-3" />
         </div>
       ) : (
-        <div className="flex items-center text-amber-600" title="Unverified link">
-          <ExclamationTriangleIcon className="w-3 h-3" />
+        <div className="flex items-center text-amber-600 dark:text-amber-400" title="Unverified link">
+          <XCircleIcon className="w-3 h-3" />
         </div>
       )}
     </div>

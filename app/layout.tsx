@@ -1,5 +1,6 @@
 import './globals.css'
 import React from 'react'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 export const metadata = {
   title: 'Learn Anything With AI | Personalized Learning Paths',
@@ -19,11 +20,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="font-sans">
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-          {children}
-        </div>
+        <ThemeProvider>
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-purple-950">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )
