@@ -216,7 +216,7 @@ export default function AppContent() {
                   <button
                     key={example.name}
                     onClick={() => setTopic(example.name)}
-                    className="group relative p-6 bg-white/60 dark:bg-gray-800/60 hover:bg-white/80 dark:hover:bg-gray-700/80 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 transform hover:scale-105 hover:shadow-xl backdrop-blur-sm interactive-card hover-lift"
+                    className="group relative p-6 bg-white/60 dark:bg-gray-800/60 hover:bg-white/80 dark:hover:bg-gray-700/80 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 transform hover:scale-105 hover:shadow-xl backdrop-blur-sm hover-lift"
                     disabled={loading}
                     style={{ animationDelay: `${index * 100}ms` }}
                   >

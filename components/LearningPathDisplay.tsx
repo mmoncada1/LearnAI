@@ -124,7 +124,7 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
           return (
             <div 
               key={index}
-              className={`card transition-all duration-500 slide-up interactive-card hover-lift ${
+              className={`card transition-all duration-500 slide-up hover-lift ${
                 isCompleted ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 glow-effect' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
@@ -188,7 +188,7 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center space-x-3 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all duration-300 group hover-lift interactive-card"
+                          className="flex items-center space-x-3 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all duration-300 group hover-lift"
                         >
                           <div className={`p-2 rounded-lg ${getResourceTypeColor(resource.type || 'article')}`}>
                             {getResourceIcon(resource.type || 'article')}
