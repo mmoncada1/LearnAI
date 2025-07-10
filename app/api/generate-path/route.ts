@@ -106,11 +106,11 @@ Guidelines:
 Focus on creating a realistic, achievable learning path with genuine, working resources.`;
 
     console.log('Making OpenAI API call...');
-    console.log('Using model: gpt-3.5-turbo'); // Try more stable model
+    console.log('Using model: gpt-4o-mini');
     console.log('Prompt length:', prompt.length);
     
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // Use more widely available model
+      model: "gpt-4o-mini", // Keep the original working model
       messages: [
         {
           role: "system",
@@ -122,7 +122,7 @@ Focus on creating a realistic, achievable learning path with genuine, working re
         }
       ],
       temperature: 0.7,
-      max_tokens: 1500, // Reduce token count to speed up response
+      max_tokens: 2000, // Back to original token count
     });
 
     console.log('OpenAI API call successful');
