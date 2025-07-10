@@ -9,7 +9,8 @@ import {
   AcademicCapIcon,
   ClockIcon,
   ArrowPathIcon,
-  ArrowTopRightOnSquareIcon
+  ArrowTopRightOnSquareIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
 import LinkValidator from './LinkValidator';
@@ -123,9 +124,10 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
           return (
             <div 
               key={index}
-              className={`card transition-all duration-200 ${
-                isCompleted ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : ''
+              className={`card transition-all duration-500 slide-up interactive-card hover-lift ${
+                isCompleted ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 glow-effect' : ''
               }`}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="flex items-start space-x-4">
                 {/* Stage Number & Checkbox */}
@@ -139,12 +141,12 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
                   </div>
                   <button
                     onClick={() => toggleStageComplete(index)}
-                    className="transition-colors duration-200"
+                    className="transition-all duration-300 hover:scale-110"
                   >
                     {isCompleted ? (
-                      <CheckCircleIconSolid className="w-6 h-6 text-green-600" />
+                      <CheckCircleIconSolid className="w-6 h-6 text-green-600 heartbeat" />
                     ) : (
-                      <CheckCircleIcon className="w-6 h-6 text-gray-400 hover:text-green-500" />
+                      <CheckCircleIcon className="w-6 h-6 text-gray-400 hover:text-green-500 hover:wiggle" />
                     )}
                   </button>
                 </div>
@@ -186,7 +188,7 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center space-x-3 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all duration-200 group"
+                          className="flex items-center space-x-3 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md transition-all duration-300 group hover-lift interactive-card"
                         >
                           <div className={`p-2 rounded-lg ${getResourceTypeColor(resource.type || 'article')}`}>
                             {getResourceIcon(resource.type || 'article')}
@@ -228,19 +230,25 @@ export default function LearningPathDisplay({ learningPath, onReset }: LearningP
 
       {/* Completion Message */}
       {completedStages.size === learningPath.stages.length && (
-        <div className="card bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 animate-slide-up">
-          <div className="text-center py-6">
-            <CheckCircleIconSolid className="w-16 h-16 text-green-600 dark:text-green-400 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-green-900 dark:text-green-100 mb-2">
+        <div className="card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800 bounce-in glow-effect neon-glow">
+          <div className="text-center py-8">
+            <div className="relative mb-6">
+              <CheckCircleIconSolid className="w-20 h-20 text-green-600 dark:text-green-400 mx-auto pulse-glow" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 bg-green-400 rounded-full animate-ping opacity-20"></div>
+              </div>
+            </div>
+            <h3 className="text-3xl font-bold gradient-text mb-3 text-shadow">
               Congratulations! 🎉
             </h3>
-            <p className="text-green-700 dark:text-green-300 mb-4">
-              You've completed your learning path for {learningPath.topic}!
+            <p className="text-green-700 dark:text-green-300 mb-6 text-lg">
+              You've completed your learning path for <span className="font-semibold">{learningPath.topic}</span>!
             </p>
             <button
               onClick={onReset}
-              className="btn-primary"
+              className="btn-primary hover:neon-glow"
             >
+              <SparklesIcon className="w-5 h-5 mr-2" />
               Start a New Learning Journey
             </button>
           </div>

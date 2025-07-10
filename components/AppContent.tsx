@@ -5,6 +5,9 @@ import { LearningPath, GeneratePathRequest } from '@/types';
 import LearningPathDisplay from '@/components/LearningPathDisplay';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ThemeToggle from '@/components/ThemeToggle';
+import FloatingActionButton from '@/components/FloatingActionButton';
+import SuccessAnimation from '@/components/SuccessAnimation';
+import TypingEffect from '@/components/TypingEffect';
 import { BookOpenIcon, SparklesIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
 import { sampleLearningPath } from '@/lib/sampleData';
 
@@ -14,6 +17,7 @@ export default function AppContent() {
   const [learningPath, setLearningPath] = useState<LearningPath | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +51,11 @@ export default function AppContent() {
       }
 
       const path: LearningPath = await response.json();
-      setLearningPath(path);
+      setShowSuccess(true);
+      setTimeout(() => {
+        setLearningPath(path);
+        setShowSuccess(false);
+      }, 2500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
@@ -68,21 +76,23 @@ export default function AppContent() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative z-10">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className="glass-card border-b border-white/20 dark:border-gray-700/20 sticky top-0 z-50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center w-12 h-12 bg-primary-600 rounded-xl">
-                <SparklesIcon className="w-7 h-7 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary-500 to-purple-600 rounded-2xl shadow-lg glow-effect float-animation">
+                <SparklesIcon className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Learn Anything With AI</h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Get personalized learning paths for any skill or topic</p>
+                <h1 className="text-3xl font-bold gradient-text">LearnAI</h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1 font-medium">Personalized learning paths powered by AI</p>
               </div>
             </div>
-            <ThemeToggle />
+            <div className="floating-card">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -91,118 +101,132 @@ export default function AppContent() {
         {!learningPath ? (
           <div className="max-w-2xl mx-auto">
             {/* Hero Section */}
-            <div className="text-center mb-12">
-              <div className="flex justify-center mb-6">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full">
-                    <BookOpenIcon className="w-8 h-8 text-blue-600" />
+            <div className="text-center mb-16">
+              <div className="flex justify-center mb-8">
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl shadow-2xl glow-effect float-animation">
+                    <BookOpenIcon className="w-10 h-10 text-white" />
                   </div>
-                  <div className="text-4xl font-bold text-gray-400">→</div>
-                  <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full">
-                    <AcademicCapIcon className="w-8 h-8 text-purple-600" />
+                  <div className="text-6xl font-bold gradient-text pulse-glow">→</div>
+                  <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-3xl shadow-2xl glow-effect float-animation" style={{animationDelay: '2s'}}>
+                    <AcademicCapIcon className="w-10 h-10 text-white" />
                   </div>
                 </div>
               </div>
-              <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                What do you want to learn?
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-                Enter any skill or topic, and we'll create a personalized learning roadmap with curated resources just for you.
+              <div className="flex justify-center mb-8">
+                <h2 className="text-5xl md:text-6xl font-bold bounce-in whitespace-nowrap gradient-text">
+                  Learn <TypingEffect 
+                    texts={[
+                      'Anything',
+                      'Programming',
+                      'Design',
+                      'Marketing',
+                      'Data Science',
+                      'AI & ML',
+                      'Business',
+                      'Languages'
+                    ]}
+                    className="gradient-text"
+                    speed={150}
+                    deleteSpeed={100}
+                    delay={1500}
+                  /> With AI
+                </h2>
+              </div>
+              <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+                Enter any skill or topic, and we'll create a <span className="gradient-text font-semibold">personalized learning roadmap</span> with curated resources just for you.
               </p>
             </div>
 
             {/* Input Form */}
-            <form onSubmit={handleSubmit} className="card space-y-6">
-              <div>
-                <label htmlFor="topic" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Learning Topic
+            <form onSubmit={handleSubmit} className="card space-y-8">
+              <div className="space-y-2">
+                <label htmlFor="topic" className="block text-lg font-semibold gradient-text mb-3">
+                  🎯 Learning Topic
                 </label>
                 <input
                   type="text"
                   id="topic"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="input-field"
+                  className="input-field text-lg"
                   placeholder="e.g., Full-stack web development, Python programming, Digital marketing..."
                   disabled={loading}
                 />
               </div>
 
-              <div>
-                <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Experience Level
+              <div className="space-y-2">
+                <label htmlFor="difficulty" className="block text-lg font-semibold gradient-text mb-3">
+                  🎯 Experience Level
                 </label>
-                <select
+                <div className="select-wrapper">                <select
                   id="difficulty"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value as 'beginner' | 'intermediate' | 'advanced')}
-                  className="input-field"
+                  className="select-field text-lg"
                   disabled={loading}
                 >
-                  <option value="beginner">Beginner - I'm new to this</option>
-                  <option value="intermediate">Intermediate - I have some experience</option>
-                  <option value="advanced">Advanced - I want to deepen my knowledge</option>
-                </select>
+                    <option value="beginner">🌱 Beginner - I'm new to this</option>
+                    <option value="intermediate">🌿 Intermediate - I have some experience</option>
+                    <option value="advanced">🌳 Advanced - I want to deepen my knowledge</option>
+                  </select>
+                </div>
               </div>
 
               {error && (
-                <div className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+                <div className="bg-red-50/80 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-2xl p-6 backdrop-blur-sm">
+                  <p className="text-red-700 dark:text-red-300 text-base font-medium">⚠️ {error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={loading || !topic.trim()}
-                className="btn-primary w-full flex items-center justify-center space-x-2"
+                className="btn-primary w-full text-lg group relative overflow-hidden"
               >
-                {loading ? (
-                  <>
-                    <LoadingSpinner size="sm" />
-                    <span>Generating your learning path...</span>
-                  </>
-                ) : (
-                  <>
-                    <SparklesIcon className="w-5 h-5" />
-                    <span>Generate Learning Path</span>
-                  </>
-                )}
-              </button>
-
-              <div className="text-center">
-                <span className="text-gray-500 dark:text-gray-400">or</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleDemo}
-                disabled={loading}
-                className="btn-secondary w-full flex items-center justify-center space-x-2"
-              >
-                <AcademicCapIcon className="w-5 h-5" />
-                <span>View Demo Learning Path</span>
+                <div className="relative z-10 flex items-center justify-center space-x-3">
+                  {loading ? (
+                    <>
+                      <LoadingSpinner size="sm" variant="brain" />
+                      <span>✨ Generating your learning path...</span>
+                    </>
+                  ) : (
+                    <>
+                      <SparklesIcon className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
+                      <span>Generate Learning Path</span>
+                    </>
+                  )}
+                </div>
+                {loading && <div className="absolute inset-0 shimmer"></div>}
               </button>
             </form>
 
             {/* Examples */}
-            <div className="mt-12">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 text-center">Popular Learning Paths</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-16">
+              <h3 className="text-2xl font-bold gradient-text mb-8 text-center">🔥 Popular Learning Paths</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
-                  'Frontend Development',
-                  'Data Science with Python',
-                  'Digital Marketing',
-                  'Mobile App Development',
-                  'Machine Learning',
-                  'UX/UI Design'
-                ].map((example) => (
+                  { name: 'Frontend Development', emoji: '🎨', color: 'from-blue-500 to-cyan-500' },
+                  { name: 'Data Science with Python', emoji: '📊', color: 'from-green-500 to-emerald-500' },
+                  { name: 'Digital Marketing', emoji: '📱', color: 'from-pink-500 to-rose-500' },
+                  { name: 'Mobile App Development', emoji: '📲', color: 'from-purple-500 to-violet-500' },
+                  { name: 'Machine Learning', emoji: '🤖', color: 'from-orange-500 to-amber-500' },
+                  { name: 'UX/UI Design', emoji: '🎭', color: 'from-indigo-500 to-blue-500' }
+                ].map((example, index) => (
                   <button
-                    key={example}
-                    onClick={() => setTopic(example)}
-                    className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 transition-colors duration-200"
+                    key={example.name}
+                    onClick={() => setTopic(example.name)}
+                    className="group relative p-6 bg-white/60 dark:bg-gray-800/60 hover:bg-white/80 dark:hover:bg-gray-700/80 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 transform hover:scale-105 hover:shadow-xl backdrop-blur-sm interactive-card hover-lift"
                     disabled={loading}
+                    style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">{example}</span>
+                    <div className={`absolute inset-0 bg-gradient-to-r ${example.color} rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                    <div className="relative z-10 text-left">
+                      <div className="text-3xl mb-3">{example.emoji}</div>
+                      <span className="text-gray-800 dark:text-gray-200 font-semibold group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
+                        {example.name}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -217,6 +241,16 @@ export default function AppContent() {
           </div>
         )}
       </main>
+
+      {/* Floating Action Button */}
+      <FloatingActionButton />
+
+      {/* Success Animation */}
+      <SuccessAnimation 
+        show={showSuccess}
+        message="Learning Path Generated!"
+        onComplete={() => setShowSuccess(false)}
+      />
     </div>
   );
 }
